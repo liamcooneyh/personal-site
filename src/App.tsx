@@ -3,7 +3,7 @@ import { DataLens } from './components/DataLens';
 import { GalleryRoom } from './components/GalleryRoom';
 import { InkIntro } from './components/InkIntro';
 import { Landing } from './components/Landing';
-import { ThemeToggle } from './components/ThemeToggle';
+import { TopBar } from './components/TopBar';
 import { Headshot } from './components/Headshot';
 import { Projects } from './components/Projects';
 import { WorkList } from './components/WorkList';
@@ -22,22 +22,7 @@ export const App = () => {
       Skip to content
     </a>
 
-    <header className="topbar">
-      <a className="topbar__name" href="/" onClick={navigate}>
-        Liam Cooney
-      </a>
-      <nav className="topbar__nav" aria-label="Sections">
-        <a href="/#work" onClick={navigate}>Work</a>
-        <a href="/#built" onClick={navigate}>Projects</a>
-        <a href="/art" onClick={navigate} aria-current={page === 'art' ? 'page' : undefined}>
-          Art
-        </a>
-        <ThemeToggle />
-        <a className="pill pill--ink" href="#hi">
-          Say hi
-        </a>
-      </nav>
-    </header>
+    <TopBar page={page} />
 
     {page === 'art' ? (
     <main id="main" className="art-page">
@@ -100,7 +85,7 @@ export const App = () => {
             operations teams depend on. I also paint.
           </p>
           <p className="hero__hint">
-            That’s one of mine on the right. Move your cursor over it (or tap) and the lens turns
+            The painting is one of mine. Move your cursor over it (or tap) and the lens turns
             the paint into data. Click to see that color full-screen, or switch the lens off to just look.
           </p>
           <div className="hero__ctas">

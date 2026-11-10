@@ -316,10 +316,23 @@ html.intro-active body {
 }
 
 .topbar__nav {
+  order: 1;
   display: flex;
   align-items: center;
   gap: 6px 22px;
+  margin-left: auto;
   font-weight: 600;
+}
+
+.topbar__end {
+  order: 2;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.topbar__menu {
+  display: none;
 }
 
 .topbar__nav a:not(.pill) {
@@ -1210,6 +1223,75 @@ html.flood-open body {
   }
 }
 
+/* Portrait screens: the drawing is wide and short, so the landing hugs it instead of filling the
+   screen, and the drawing runs edge to edge (its sides already fade out) */
+@media (orientation: portrait) {
+  .landing {
+    grid-template-rows: auto;
+    height: auto;
+    min-height: 0;
+    gap: 14px;
+    padding-block: 36px 40px;
+  }
+
+  .landing__lineup {
+    width: calc(100% + 2 * var(--gutter));
+    max-width: none;
+    margin-inline: calc(-1 * var(--gutter));
+  }
+}
+
+/* Phones: one-line name, Menu button, links in a panel under the bar */
+@media (max-width: 720px) {
+  .topbar {
+    padding-block: 10px;
+  }
+
+  .topbar__name {
+    font-size: 1.15rem;
+    white-space: nowrap;
+  }
+
+  .topbar__menu {
+    display: inline-flex;
+    min-width: 5.2em;
+  }
+
+  .topbar__nav {
+    position: absolute;
+    inset: 100% 0 auto;
+    display: none;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+    margin: 0;
+    padding: 6px var(--gutter) 20px;
+    background: var(--paper);
+    border-bottom: var(--border);
+  }
+
+  .topbar.is-open .topbar__nav {
+    display: flex;
+  }
+
+  .topbar__nav a:not(.pill) {
+    padding: 14px 0;
+    border-bottom: 1px solid color-mix(in srgb, var(--ink) 18%, transparent);
+    background-image: none;
+    font-size: 1.6rem;
+    font-weight: 900;
+    font-stretch: 118%;
+    letter-spacing: -0.02em;
+  }
+
+  .topbar__nav .pill {
+    align-self: flex-start;
+    margin-top: 18px;
+    font-size: 1.125rem;
+    padding: 0.7em 1.4em;
+  }
+}
+
 @media (max-width: 560px) {
   .toolkit {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1697,12 +1779,6 @@ html.flood-open body {
 }
 
 @media (max-width: 560px) {
-  .topbar__nav a:not(.pill) {
-    display: none;
-  }
-
-
-
   .gallery {
     --row: 110px;
   }
