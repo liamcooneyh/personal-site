@@ -1,0 +1,388 @@
+{
+  "picks": {
+    "a050": {
+      "kind": "Oil",
+      "section": "painting",
+      "hero": true,
+      "heroOrder": 2
+    },
+    "a051": {
+      "kind": "Oil",
+      "year": "",
+      "section": "painting",
+      "hero": true,
+      "heroOrder": 1
+    },
+    "a096": {
+      "section": "painting",
+      "hero": true,
+      "heroOrder": 4
+    },
+    "a057": {
+      "section": "painting"
+    },
+    "a029": {
+      "section": "painting"
+    },
+    "a022": {
+      "section": "painting",
+      "hero": true,
+      "heroOrder": 3
+    },
+    "a168": {
+      "section": "painting"
+    },
+    "a166": {
+      "section": "painting"
+    },
+    "a165": {
+      "section": "painting"
+    },
+    "a157": {
+      "section": "painting"
+    },
+    "a155": {
+      "section": "painting"
+    },
+    "a154": {
+      "section": "painting"
+    },
+    "a153": {
+      "section": "painting"
+    },
+    "a147": {
+      "section": "painting",
+      "hero": true,
+      "heroOrder": 6
+    },
+    "a146": {
+      "section": "painting",
+      "hero": true,
+      "heroOrder": 7
+    },
+    "a141": {
+      "section": "painting"
+    },
+    "a136": {
+      "section": "painting",
+      "hero": true,
+      "heroOrder": 8
+    },
+    "a132": {
+      "section": "painting",
+      "hero": true,
+      "heroOrder": 10
+    },
+    "a115": {
+      "section": "painting"
+    },
+    "a114": {
+      "section": "painting"
+    },
+    "a098": {
+      "section": "painting"
+    },
+    "a013": {
+      "section": "painting"
+    },
+    "a042": {
+      "section": "sketch"
+    },
+    "a019": {
+      "section": "sketch"
+    },
+    "a085": {
+      "section": "sketch"
+    },
+    "a084": {
+      "section": "sketch"
+    },
+    "a080": {
+      "section": "sketch"
+    },
+    "a076": {
+      "section": "sketch"
+    },
+    "a073": {
+      "section": "sketch"
+    },
+    "a049": {
+      "section": "sketch"
+    },
+    "a055": {
+      "section": "sketch"
+    },
+    "a044": {
+      "section": "sketch"
+    },
+    "a024": {
+      "section": "sketch"
+    },
+    "a101": {
+      "section": "sketch"
+    },
+    "a078": {
+      "section": "sketch"
+    },
+    "a123": {
+      "section": "painting"
+    },
+    "a089": {
+      "section": "painting",
+      "year": "2021"
+    },
+    "a125": {
+      "section": "painting"
+    },
+    "a126": {
+      "section": "painting"
+    },
+    "a127": {
+      "section": "painting"
+    },
+    "a128": {
+      "section": "painting"
+    },
+    "a172": {
+      "section": "painting"
+    },
+    "a087": {
+      "section": "painting"
+    },
+    "a086": {
+      "section": "painting"
+    },
+    "a030": {
+      "section": "painting"
+    },
+    "a151": {
+      "section": "sketch"
+    },
+    "a149": {
+      "section": "painting"
+    },
+    "a140": {
+      "section": "painting"
+    },
+    "a131": {
+      "section": "painting"
+    },
+    "a138": {
+      "section": "painting"
+    },
+    "a134": {
+      "section": "painting",
+      "hero": true,
+      "heroOrder": 9
+    },
+    "a122": {
+      "section": "painting"
+    },
+    "a119": {
+      "section": "painting"
+    },
+    "a116": {
+      "section": "painting"
+    },
+    "a110": {
+      "section": "painting"
+    },
+    "a109": {
+      "section": "painting"
+    },
+    "a104": {
+      "section": "painting"
+    },
+    "a097": {
+      "section": "painting",
+      "year": "2020"
+    },
+    "a091": {
+      "section": "painting",
+      "year": "2020"
+    },
+    "a023": {
+      "section": "painting"
+    },
+    "a011": {
+      "section": "painting"
+    },
+    "a032": {
+      "section": "painting"
+    },
+    "a160": {
+      "section": "sketch"
+    },
+    "a083": {
+      "section": "sketch"
+    },
+    "a082": {
+      "section": "sketch"
+    },
+    "a081": {
+      "section": "sketch"
+    },
+    "a074": {
+      "section": "sketch"
+    },
+    "a039": {
+      "section": "sketch"
+    },
+    "a038": {
+      "section": "sketch"
+    },
+    "a001": {
+      "section": "sketch"
+    },
+    "a143": {
+      "section": "sketch"
+    },
+    "a025": {
+      "section": "sketch"
+    },
+    "a005": {
+      "section": "painting"
+    },
+    "a007": {
+      "section": "painting"
+    },
+    "a008": {
+      "section": "painting"
+    },
+    "a009": {
+      "section": "painting"
+    },
+    "a094": {
+      "section": "painting",
+      "year": "2020"
+    },
+    "a095": {
+      "section": "painting",
+      "year": "2020"
+    },
+    "a117": {
+      "section": "painting"
+    },
+    "a045": {
+      "section": "painting"
+    },
+    "a159": {
+      "section": "painting"
+    },
+    "a090": {
+      "section": "painting",
+      "year": "2020"
+    },
+    "a108": {
+      "section": "painting"
+    },
+    "a107": {
+      "section": "painting"
+    },
+    "a105": {
+      "section": "painting"
+    },
+    "a106": {
+      "section": "painting"
+    },
+    "a163": {
+      "section": "painting"
+    },
+    "a026": {
+      "section": "painting",
+      "hero": true,
+      "heroOrder": 5
+    },
+    "b005": {
+      "section": "painting",
+      "year": "2019"
+    },
+    "b006": {
+      "section": "painting",
+      "year": "2020"
+    },
+    "a033": {
+      "section": "sketch"
+    },
+    "a046": {
+      "section": "sketch"
+    },
+    "a047": {
+      "section": "sketch"
+    },
+    "a048": {
+      "section": "sketch"
+    },
+    "a053": {
+      "section": "sketch"
+    },
+    "a054": {
+      "section": "sketch"
+    },
+    "a065": {
+      "section": "sketch"
+    },
+    "a069": {
+      "section": "sketch"
+    },
+    "a070": {
+      "section": "sketch"
+    },
+    "a071": {
+      "section": "sketch"
+    },
+    "a079": {
+      "section": "sketch"
+    },
+    "b002": {
+      "section": "sketch",
+      "year": "2024"
+    },
+    "b008": {
+      "section": "sketch",
+      "year": "2017"
+    },
+    "b009": {
+      "section": "sketch",
+      "year": "2018"
+    },
+    "b028": {
+      "section": "sketch"
+    },
+    "b030": {
+      "section": "sketch",
+      "year": "2024"
+    },
+    "a158": {
+      "section": "sketch"
+    },
+    "a021": {
+      "section": "sketch"
+    },
+    "b004": {
+      "section": "sketch"
+    },
+    "a041": {
+      "section": "sketch"
+    },
+    "a062": {
+      "section": "sketch"
+    },
+    "b001": {
+      "section": "sketch"
+    },
+    "a103": {
+      "section": "sketch"
+    },
+    "a010": {
+      "section": "sketch"
+    },
+    "a056": {
+      "section": "sketch"
+    },
+    "a036": {
+      "section": "sketch"
+    }
+  },
+  "shot": {}
+}

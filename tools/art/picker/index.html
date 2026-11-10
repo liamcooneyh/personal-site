@@ -1,0 +1,265 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Art picker</title>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&display=swap" rel="stylesheet" />
+<style>
+  :root { --ink:#000; --paper:#fff; --red:#ff3d1f; --blue:#1f45ff; --ochre:#ffc21a; --lime:#c9f23b; }
+  * { box-sizing: border-box; }
+  body { margin:0; font-family: Archivo, Arial, sans-serif; background: var(--paper); color: var(--ink); }
+  header { position: sticky; top:0; z-index:5; background: var(--paper); border-bottom: 3px solid var(--ink); padding: 14px 20px; display:flex; flex-wrap:wrap; gap: 10px 24px; align-items:center; justify-content:space-between; }
+  h1 { margin:0; font-size: 1.6rem; font-weight: 900; font-stretch: 120%; letter-spacing:-.02em; }
+  .help { margin: 4px 0 0; max-width: 70ch; font-size: .95rem; }
+  .bar { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+  .tab, .btn { border: 2.5px solid var(--ink); border-radius: 999px; padding: 6px 14px; background: var(--paper); font: inherit; font-weight: 700; cursor: pointer; }
+  .tab[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+  .count { font-weight: 800; font-size: 1.05rem; }
+  .status { font-size: .9rem; min-width: 60px; }
+  main { padding: 20px; }
+  .year { font-size: 2.6rem; font-weight: 900; font-stretch: 125%; margin: 28px 0 12px; letter-spacing: -.04em; }
+  .grid { display:grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; }
+  .card { border: 3px solid var(--ink); border-radius: 18px; overflow: hidden; display:flex; flex-direction:column; background: var(--paper); }
+  .card.picked { background: var(--lime); }
+  .card.hero { background: var(--ochre); }
+  .shot { position: relative; aspect-ratio: 1; background: #ececec; cursor: zoom-in; border: 0; padding:0; display:block; width:100%; }
+  .shot img { width:100%; height:100%; object-fit: contain; display:block; }
+  .flag { position:absolute; left:8px; top:8px; background: var(--ink); color: var(--paper); border-radius: 999px; padding: 2px 9px; font-size: .78rem; font-weight: 700; }
+  .body { padding: 10px 12px 12px; display:flex; flex-direction:column; gap: 8px; }
+  .meta { display:flex; justify-content:space-between; font-size:.85rem; font-weight:600; }
+  .actions { display:flex; gap:6px; }
+  .actions .btn { flex:1; padding: 6px 8px; font-size: .9rem; }
+  .btn.on { background: var(--ink); color: var(--paper); }
+  .dupes { display:flex; gap:6px; align-items:center; font-size:.8rem; font-weight:600; flex-wrap: wrap; }
+  .dupes button { width: 40px; height: 40px; padding:0; border: 2px solid transparent; border-radius: 6px; overflow:hidden; cursor:pointer; background:#eee; }
+  .dupes button[aria-pressed="true"] { border-color: var(--ink); }
+  .dupes img { width:100%; height:100%; object-fit: cover; display:block; }
+  .fields { display:grid; grid-template-columns: 1fr 72px; gap:6px; }
+  .fields input { font: inherit; font-size: .88rem; border: 2px solid var(--ink); border-radius: 8px; padding: 5px 7px; min-width: 0; background: var(--paper); }
+  .kind { display:flex; gap:4px; flex-wrap: wrap; }
+  .kind button { font: inherit; font-size: .78rem; font-weight: 700; border: 2px solid var(--ink); border-radius: 999px; padding: 2px 9px; background: var(--paper); cursor:pointer; }
+  .kind button[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+  .result { display:grid; grid-template-columns: 64px 1fr; gap:8px; align-items:center; border-top: 2px solid var(--ink); padding-top: 8px; font-size:.82rem; font-weight:600; }
+  .result img { width:64px; height:64px; object-fit: contain; background:#000; border-radius:6px; }
+  .result .fix { justify-self:start; font: inherit; font-weight:700; border:2px solid var(--ink); border-radius:999px; padding:3px 10px; background: var(--paper); cursor:pointer; margin-top:4px; }
+  #editor { width: min(96vw, 1200px); }
+  .ed { display:grid; grid-template-columns: minmax(0,1.4fr) minmax(0,1fr); gap:16px; background:#fff; padding:16px; border-radius:16px; }
+  .ed h2 { margin:0 0 6px; font-weight:900; font-stretch:115%; }
+  .ed p { margin:0 0 10px; color:#000; font-weight:500; }
+  .stage { position:relative; user-select:none; touch-action:none; background:#222; }
+  .stage img { display:block; max-width:100%; max-height:76vh; border:0; }
+  .stage svg { position:absolute; inset:0; width:100%; height:100%; pointer-events:none; }
+  .handle { position:absolute; width:26px; height:26px; margin:-13px 0 0 -13px; border-radius:50%; background: var(--lime); border:3px solid #000; cursor:grab; }
+  .after img { max-width:100%; max-height:60vh; display:block; border:3px solid #000; background:#000; }
+  .ed .row { display:flex; gap:8px; margin-top:12px; flex-wrap:wrap; }
+  dialog { border:0; padding:0; background: transparent; max-width: 96vw; }
+  dialog::backdrop { background: rgba(0,0,0,.9); }
+  dialog img { max-width: 92vw; max-height: 88vh; display:block; border: 4px solid #fff; }
+  dialog p { color:#fff; font-weight:700; }
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <h1>Pick your art</h1>
+    <p class="help">Click <b>Use on site</b> on every piece you want on the wall. Click <b>Hero</b> on the painting you'd want at the top of the site (one or a few, and I'll rotate them). Title, year and medium are optional but help. Each pick gets straightened, cropped and colour-corrected automatically; if a crop looks wrong, hit <b>Fix crop</b> and drag the corners. Where you took more than one photo of a piece, the small squares let you choose the best photo. Everything saves automatically.</p>
+  </div>
+  <div class="bar">
+    <span class="count" id="count"></span>
+    <button class="tab" data-filter="all" aria-pressed="true">All</button>
+    <button class="tab" data-filter="picked" aria-pressed="false">Picked</button>
+    <button class="tab" data-filter="onsite" aria-pressed="false">On the site now</button>
+    <span class="status" id="status"></span>
+  </div>
+</header>
+<main id="main"></main>
+<dialog id="editor"><div class="ed">
+  <div><div class="stage" id="stage"><img id="edImg" alt="" draggable="false"><svg id="edSvg"><polygon id="edPoly" fill="rgba(201,242,59,.18)" stroke="#c9f23b" stroke-width="3"/></svg></div></div>
+  <div><h2>Fix the crop</h2><p>Drag the four green dots onto the corners of the canvas or page, then hit <b>Apply</b>. The cleaned-up version shows below.</p>
+    <div class="after"><img id="edAfter" alt=""></div>
+    <div class="row"><button class="btn" id="edApply">Apply</button><button class="btn" id="edAuto">Back to automatic</button><button class="btn" id="edClose">Done</button></div>
+    <p id="edStatus"></p></div>
+</div></dialog>
+<dialog id="viewer"><img id="viewerImg" alt="" /><p id="viewerCap"></p></dialog>
+<script>
+const KINDS = ['Oil', 'Acrylic', 'Ink / sketch', 'Mixed'];
+let items = [], state = { picks: {}, shot: {} }, filter = 'all', saveTimer;
+let crops = {}, busy = new Set(), version = {};
+const queue = [];
+let running = false;
+const runQueue = async () => {
+  if (running) return; running = true;
+  while (queue.length) {
+    const job = queue.shift();
+    busy.add(job.id); render();
+    try {
+      const res = await fetch('/process', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(job) }).then(r => r.json());
+      if (res.error) throw new Error(res.error);
+      crops[job.id] = res; version[job.id] = Date.now();
+    } catch (e) { console.error(e); document.getElementById('status').textContent = `Couldn’t clean up ${job.id}`; }
+    busy.delete(job.id); render(); job.done?.();
+  }
+  running = false;
+};
+const enqueue = (id, corners, done) => { if (queue.some(j => j.id === id)) return; queue.push({ id, corners, done }); runQueue(); };
+const processedSrc = (id) => `/processed/${id}-s.webp?v=${version[id] ?? 0}`;
+
+const byId = {};
+
+const save = () => {
+  clearTimeout(saveTimer);
+  document.getElementById('status').textContent = 'Saving…';
+  saveTimer = setTimeout(async () => {
+    await fetch('/save', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(state) });
+    document.getElementById('status').textContent = 'Saved';
+  }, 300);
+};
+
+const groupsInOrder = () => {
+  const groups = new Map();
+  for (const it of items) {
+    if (!groups.has(it.group)) groups.set(it.group, []);
+    groups.get(it.group).push(it);
+  }
+  return [...groups.values()].sort((a, b) => b[0].date.localeCompare(a[0].date));
+};
+
+const shotFor = (group) => byId[state.shot[group[0].group]] ?? group[0];
+const pickOf = (group) => group.map((it) => state.picks[it.id]).find(Boolean);
+const pickKey = (group) => group.find((it) => state.picks[it.id])?.id;
+
+const setShot = (group, id) => {
+  const key = pickKey(group);
+  const pick = key ? state.picks[key] : null;
+  if (key) delete state.picks[key];
+  state.shot[group[0].group] = id;
+  if (pick) { state.picks[id] = pick; if (!crops[id]) enqueue(id); }
+  save(); render();
+};
+
+const render = () => {
+  const main = document.getElementById('main');
+  main.innerHTML = '';
+  const groups = groupsInOrder().filter((g) =>
+    filter === 'picked' ? pickOf(g) : filter === 'onsite' ? g.some((it) => it.onSite) : true);
+  let lastYear = '';
+  let grid;
+  for (const group of groups) {
+    const shot = shotFor(group);
+    const year = shot.date.slice(0, 4);
+    if (year !== lastYear) {
+      const h = document.createElement('h2'); h.className = 'year'; h.textContent = `Photographed ${year}`;
+      main.append(h); grid = document.createElement('div'); grid.className = 'grid'; main.append(grid); lastYear = year;
+    }
+    const pick = pickOf(group);
+    const card = document.createElement('article');
+    card.className = 'card' + (pick ? ' picked' : '') + (pick?.hero ? ' hero' : '');
+    card.innerHTML = `
+      <button class="shot" title="See it bigger"><img loading="lazy" src="img/${shot.id}.jpg" alt="">
+        ${group.some((it) => it.onSite) ? '<span class="flag">On the site now</span>' : ''}</button>
+      <div class="body">
+        <div class="meta"><span>${shot.date.slice(0, 10)}</span><span>${shot.file}</span></div>
+        <div class="actions">
+          <button class="btn ${pick ? 'on' : ''}" data-act="pick">${pick ? 'On site ✓' : 'Use on site'}</button>
+          <button class="btn ${pick?.hero ? 'on' : ''}" data-act="hero">${pick?.hero ? 'Hero ★' : 'Hero'}</button>
+        </div>
+        ${group.length > 1 ? `<div class="dupes">${group.length} photos:${group.map((it) =>
+          `<button data-shot="${it.id}" aria-pressed="${it.id === shot.id}" title="Use this photo"><img src="img/${it.id}.jpg" alt=""></button>`).join('')}</div>` : ''}
+        ${pick ? `<div class="fields">
+            <input data-field="title" placeholder="Title (optional)" value="${(pick.title ?? '').replace(/"/g, '&quot;')}">
+            <input data-field="year" placeholder="Year" inputmode="numeric" value="${pick.year ?? ''}">
+          </div>
+          <div class="kind">${KINDS.map((k) => `<button data-kind="${k}" aria-pressed="${pick.kind === k}">${k}</button>`).join('')}</div>
+          <div class="result">${busy.has(pickKey(group)) || queue.some(j => j.id === pickKey(group)) ? '<span></span><span>Cleaning up…</span>'
+            : crops[pickKey(group)] ? `<img src="${processedSrc(pickKey(group))}" alt=""><span>Cleaned up${crops[pickKey(group)].how === 'manual' ? ' (your crop)' : crops[pickKey(group)].how === 'fallback' ? ' (couldn’t find edges)' : ''}<br><button class="fix" data-act="fix">Fix crop</button></span>`
+            : '<span></span><span>Waiting…</span>'}</div>` : ''}
+      </div>`;
+    card.querySelector('.shot').onclick = () => {
+      document.getElementById('viewerImg').src = `img/${shot.id}.jpg`;
+      document.getElementById('viewerCap').textContent = `${shot.file}, photographed ${shot.date.slice(0, 10)}`;
+      document.getElementById('viewer').showModal();
+    };
+    card.querySelector('[data-act="pick"]').onclick = () => {
+      if (pick) delete state.picks[pickKey(group)]; else { state.picks[shot.id] = {}; if (!crops[shot.id]) enqueue(shot.id); }
+      save(); render();
+    };
+    card.querySelector('[data-act="hero"]').onclick = () => {
+      const key = pickKey(group) ?? shot.id;
+      state.picks[key] = { ...(state.picks[key] ?? {}), hero: !state.picks[key]?.hero }; if (!crops[key]) enqueue(key);
+      save(); render();
+    };
+    card.querySelector('[data-act="fix"]')?.addEventListener('click', () => openEditor(pickKey(group)));
+    card.querySelectorAll('[data-shot]').forEach((b) => (b.onclick = () => setShot(group, b.dataset.shot)));
+    card.querySelectorAll('[data-field]').forEach((input) => (input.oninput = () => {
+      state.picks[pickKey(group)][input.dataset.field] = input.value; save();
+    }));
+    card.querySelectorAll('[data-kind]').forEach((b) => (b.onclick = () => {
+      const p = state.picks[pickKey(group)]; p.kind = p.kind === b.dataset.kind ? undefined : b.dataset.kind; save(); render();
+    }));
+    grid.append(card);
+  }
+  const picked = Object.keys(state.picks).length;
+  const heroes = Object.values(state.picks).filter((p) => p.hero).length;
+  document.getElementById('count').textContent = `${picked} picked, ${heroes} hero`;
+};
+
+document.querySelectorAll('.tab').forEach((t) => (t.onclick = () => {
+  filter = t.dataset.filter;
+  document.querySelectorAll('.tab').forEach((x) => x.setAttribute('aria-pressed', x === t));
+  render();
+}));
+let edId = null, edCorners = [];
+const edEl = (id) => document.getElementById(id);
+const drawEditor = () => {
+  const stage = edEl('stage');
+  stage.querySelectorAll('.handle').forEach((h) => h.remove());
+  const img = edEl('edImg'); const W = img.clientWidth, H = img.clientHeight;
+  edEl('edSvg').setAttribute('viewBox', `0 0 ${W} ${H}`);
+  edEl('edPoly').setAttribute('points', edCorners.map(([x, y]) => `${x * W},${y * H}`).join(' '));
+  edCorners.forEach((c, i) => {
+    const h = document.createElement('div'); h.className = 'handle';
+    h.style.left = `${c[0] * W}px`; h.style.top = `${c[1] * H}px`;
+    h.onpointerdown = (e) => {
+      h.setPointerCapture(e.pointerId);
+      h.onpointermove = (ev) => {
+        const r = img.getBoundingClientRect();
+        edCorners[i] = [Math.min(1, Math.max(0, (ev.clientX - r.left) / r.width)), Math.min(1, Math.max(0, (ev.clientY - r.top) / r.height))];
+        h.style.left = `${edCorners[i][0] * W}px`; h.style.top = `${edCorners[i][1] * H}px`;
+        edEl('edPoly').setAttribute('points', edCorners.map(([x, y]) => `${x * W},${y * H}`).join(' '));
+      };
+      h.onpointerup = () => { h.onpointermove = null; };
+    };
+    stage.append(h);
+  });
+};
+const openEditor = (id) => {
+  edId = id; edCorners = (crops[id]?.corners ?? [[.06,.06],[.94,.06],[.94,.94],[.06,.94]]).map((c) => [...c]);
+  edEl('edAfter').src = processedSrc(id); edEl('edStatus').textContent = '';
+  const img = edEl('edImg'); img.onload = drawEditor; img.src = `big/${id}.jpg`;
+  edEl('editor').showModal();
+};
+const applyEditor = (corners) => {
+  edEl('edStatus').textContent = 'Cleaning up…';
+  enqueue(edId, corners, () => {
+    edEl('edAfter').src = processedSrc(edId); edEl('edStatus').textContent = 'Done';
+    if (crops[edId]?.corners) { edCorners = crops[edId].corners.map((c) => [...c]); drawEditor(); }
+  });
+};
+edEl('edApply').onclick = () => applyEditor(edCorners);
+edEl('edAuto').onclick = () => applyEditor(undefined);
+edEl('edClose').onclick = () => edEl('editor').close();
+window.addEventListener('resize', () => edEl('editor').open && drawEditor());
+
+document.getElementById('viewer').onclick = (e) => e.currentTarget.close();
+
+Promise.all([fetch('data.json').then((r) => r.json()), fetch('/selection').then((r) => r.json()), fetch('/crops').then((r) => r.json())]).then(([data, saved, savedCrops]) => {
+  crops = savedCrops;
+  items = data.items; items.forEach((it) => (byId[it.id] = it));
+  state = { picks: saved.picks ?? {}, shot: saved.shot ?? {} };
+  render();
+  Object.keys(state.picks).forEach((id) => { if (!crops[id]) enqueue(id); });
+});
+</script>
+</body>
+</html>
