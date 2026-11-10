@@ -1461,10 +1461,7 @@ html.flood-open body {
 
 .room__wall {
   position: relative;
-  display: flex;
-  align-items: center;
   height: clamp(340px, 62svh, 600px);
-  container-type: inline-size;
   overflow-x: auto;
   overflow-y: hidden;
   overscroll-behavior-x: contain;
@@ -1486,11 +1483,12 @@ html.flood-open body {
   display: flex;
   align-items: center;
   gap: var(--gap);
-  flex: none;
   width: max-content;
+  height: 100%;
   margin: 0;
-  /* half the wall on each side, so the first and last pieces can sit in the centre */
-  padding: 0 50cqi;
+  /* percentages resolve against the wall's width: half a wall of space at each end,
+     so the first and last pieces can sit in the centre */
+  padding: 0 50%;
   list-style: none;
 }
 
@@ -1507,8 +1505,9 @@ html.flood-open body {
 
 .room__art {
   display: block;
+  /* both sides spelled out: Safari doesn't size buttons from aspect-ratio reliably */
+  width: min(calc(var(--h) * var(--ratio)), var(--max-w));
   height: min(var(--h), calc(var(--max-w) / var(--ratio)));
-  aspect-ratio: var(--ratio);
   padding: 0;
   border: var(--border);
   background: var(--white);

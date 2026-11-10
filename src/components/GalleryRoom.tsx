@@ -34,11 +34,18 @@ export const GalleryRoom = ({ artworks, kind, label }: GalleryRoomProps) => {
 
   const count = artworks.length;
 
+  /** Where an item's centre sits, measured from the wall's centre (in scroll pixels). */
+  const offsetFromCentre = (wall: HTMLElement, item: Element) => {
+    const wallBox = wall.getBoundingClientRect();
+    const itemBox = item.getBoundingClientRect();
+    return itemBox.left + itemBox.width / 2 - (wallBox.left + wallBox.width / 2);
+  };
+
   const leftFor = (i: number) => {
     const wall = wallRef.current;
-    const item = trackRef.current?.children[i] as HTMLElement | undefined;
+    const item = trackRef.current?.children[i];
     if (!wall || !item) return null;
-    return item.offsetLeft + item.offsetWidth / 2 - wall.clientWidth / 2;
+    return wall.scrollLeft + offsetFromCentre(wall, item);
   };
 
   const go = (next: number) => {
@@ -50,13 +57,13 @@ export const GalleryRoom = ({ artworks, kind, label }: GalleryRoomProps) => {
     wallRef.current?.scrollTo({ left, behavior: 'smooth' });
   };
 
-  // start on the first piece, and keep the current one centred when the wall resizes
+  // start with the first piece centred, and keep the current one centred if the wall resizes
   useLayoutEffect(() => {
     const wall = wallRef.current;
     if (!wall) return;
     const recentre = () => {
       const left = leftFor(indexRef.current);
-      if (left !== null) wall.scrollTo({ left, behavior: 'instant' });
+      if (left !== null) wall.scrollLeft = left;
     };
     recentre();
     const observer = new ResizeObserver(recentre);
@@ -69,30 +76,22 @@ export const GalleryRoom = ({ artworks, kind, label }: GalleryRoomProps) => {
     const wall = wallRef.current;
     const track = trackRef.current;
     if (!wall || !track) return;
-    let frame = 0;
+    // scroll events already arrive at most once per frame
     const onScroll = () => {
-      cancelAnimationFrame(frame);
-      frame = requestAnimationFrame(() => {
-        const centre = wall.scrollLeft + wall.clientWidth / 2;
-        let nearest = 0;
-        let best = Infinity;
-        Array.from(track.children).forEach((child, i) => {
-          const item = child as HTMLElement;
-          const distance = Math.abs(item.offsetLeft + item.offsetWidth / 2 - centre);
-          if (distance < best) {
-            best = distance;
-            nearest = i;
-          }
-        });
-        indexRef.current = nearest;
-        setIndex(nearest);
+      let nearest = 0;
+      let best = Infinity;
+      Array.from(track.children).forEach((item, i) => {
+        const distance = Math.abs(offsetFromCentre(wall, item));
+        if (distance < best) {
+          best = distance;
+          nearest = i;
+        }
       });
+      indexRef.current = nearest;
+      setIndex(nearest);
     };
     wall.addEventListener('scroll', onScroll, { passive: true });
-    return () => {
-      cancelAnimationFrame(frame);
-      wall.removeEventListener('scroll', onScroll);
-    };
+    return () => wall.removeEventListener('scroll', onScroll);
   }, []);
 
   for (let i = index - LOAD_AHEAD; i <= index + LOAD_AHEAD; i += 1) {
@@ -100,8 +99,8 @@ export const GalleryRoom = ({ artworks, kind, label }: GalleryRoomProps) => {
   }
 
   const onKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
-    if (event.key === 'ArrowRight') go(index + 1);
-    else if (event.key === 'ArrowLeft') go(index - 1);
+    if (event.key === 'ArrowRight') go(indexRef.current + 1);
+    else if (event.key === 'ArrowLeft') go(indexRef.current - 1);
     else if (event.key === 'Home') go(0);
     else if (event.key === 'End') go(count - 1);
     else return;
@@ -160,13 +159,13 @@ export const GalleryRoom = ({ artworks, kind, label }: GalleryRoomProps) => {
           </p>
         )}
         <div className="room__controls">
-          <button type="button" className="round" aria-label="Previous piece" disabled={index === 0} onClick={() => go(index - 1)}>
+          <button type="button" className="round" aria-label="Previous piece" disabled={index === 0} onClick={() => go(indexRef.current - 1)}>
             ←
           </button>
           <p className="room__count">
             {index + 1} of {count}
           </p>
-          <button type="button" className="round" aria-label="Next piece" disabled={index === count - 1} onClick={() => go(index + 1)}>
+          <button type="button" className="round" aria-label="Next piece" disabled={index === count - 1} onClick={() => go(indexRef.current + 1)}>
             →
           </button>
         </div>
