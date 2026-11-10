@@ -3,7 +3,6 @@ import { artSrc, captionArt, describeArt, type Artwork } from '../data/content';
 import { rimBurst, type BurstStroke } from '../lib/burst';
 import { ColorFlood, type FloodColor } from './ColorFlood';
 import { ZoomImage } from './ZoomImage';
-import palettes from '../data/palettes.json';
 
 type DataLensProps = {
   artworks: Artwork[];
@@ -239,14 +238,6 @@ export const DataLens = ({ artworks }: DataLensProps) => {
   const sweepFrameRef = useRef<number | null>(null);
 
   const artwork = artworks[index % artworks.length];
-
-  // the page's paint-wash background takes its colours from whichever painting is showing
-  useEffect(() => {
-    const palette = artwork ? (palettes as Record<string, string[]>)[artwork.id] : undefined;
-    if (!palette) return;
-    const root = document.documentElement;
-    palette.forEach((colour, i) => root.style.setProperty(`--wash-${i + 1}`, colour));
-  }, [artwork]);
 
   const redraw = useCallback(() => {
     const canvas = canvasRef.current;

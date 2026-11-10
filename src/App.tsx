@@ -1,5 +1,4 @@
 import { ArtWall } from './components/ArtWall';
-import { Background } from './components/Background';
 import { DataLens } from './components/DataLens';
 import { GalleryRoom } from './components/GalleryRoom';
 import { InkIntro } from './components/InkIntro';
@@ -18,7 +17,6 @@ export const App = () => {
   const [artView, setArtView] = useState<'gallery' | 'all'>('gallery');
   return (
   <>
-    <Background />
     {page === 'home' && <InkIntro />}
     <a className="skip-link" href="#main">
       Skip to content
