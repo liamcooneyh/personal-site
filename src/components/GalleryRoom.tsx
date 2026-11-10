@@ -1,4 +1,4 @@
-import { useLayoutEffect, useRef, useState, type CSSProperties, type KeyboardEvent, type PointerEvent } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type KeyboardEvent } from 'react';
 import { ArtViewer } from './ArtViewer';
 import { artSrc, describeArt, type Artwork } from '../data/content';
 
@@ -6,7 +6,6 @@ type RoomKind = 'painting' | 'sketch';
 
 /** Each piece only needs its image once it's within a few steps of the one on view. */
 const LOAD_AHEAD = 3;
-const SWIPE_PX = 40;
 
 const placardFor = (artwork: Artwork, kind: RoomKind) => ({
   title: artwork.title ?? 'Untitled',
@@ -20,37 +19,81 @@ type GalleryRoomProps = {
 };
 
 /**
- * A gallery wall: one piece in focus at a time, neighbours either side, walk with the
- * arrows, a swipe, or the keyboard. Click the piece in the light to see it full-screen.
+ * A gallery wall: one piece in focus at a time, neighbours either side. It's a native
+ * horizontal scroller that snaps each piece to the centre, so a swipe follows the finger
+ * on phones and a trackpad works on laptops; the arrows and keyboard scroll it too.
+ * Click the piece in focus to see it full-screen.
  */
 export const GalleryRoom = ({ artworks, kind, label }: GalleryRoomProps) => {
   const [index, setIndex] = useState(0);
   const [openIndex, setOpenIndex] = useState<number | null>(null);
-  const [shift, setShift] = useState(0);
   const wallRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLUListElement>(null);
   const seen = useRef(new Set<number>());
-  const swipe = useRef<{ x: number; id: number } | null>(null);
-  const didSwipe = useRef(false);
+  const indexRef = useRef(0);
 
   const count = artworks.length;
-  const go = (next: number) => setIndex(Math.min(count - 1, Math.max(0, next)));
 
-  // centre the active piece on the wall
+  const leftFor = (i: number) => {
+    const wall = wallRef.current;
+    const item = trackRef.current?.children[i] as HTMLElement | undefined;
+    if (!wall || !item) return null;
+    return item.offsetLeft + item.offsetWidth / 2 - wall.clientWidth / 2;
+  };
+
+  const go = (next: number) => {
+    const target = Math.min(count - 1, Math.max(0, next));
+    const left = leftFor(target);
+    if (left === null) return;
+    indexRef.current = target;
+    setIndex(target);
+    wallRef.current?.scrollTo({ left, behavior: 'smooth' });
+  };
+
+  // start on the first piece, and keep the current one centred when the wall resizes
   useLayoutEffect(() => {
+    const wall = wallRef.current;
+    if (!wall) return;
+    const recentre = () => {
+      const left = leftFor(indexRef.current);
+      if (left !== null) wall.scrollTo({ left, behavior: 'instant' });
+    };
+    recentre();
+    const observer = new ResizeObserver(recentre);
+    observer.observe(wall);
+    return () => observer.disconnect();
+  }, []);
+
+  // the piece nearest the centre is the one in focus
+  useEffect(() => {
     const wall = wallRef.current;
     const track = trackRef.current;
     if (!wall || !track) return;
-    const centre = () => {
-      const item = track.children[index] as HTMLElement | undefined;
-      if (!item) return;
-      setShift(wall.clientWidth / 2 - (item.offsetLeft + item.offsetWidth / 2));
+    let frame = 0;
+    const onScroll = () => {
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(() => {
+        const centre = wall.scrollLeft + wall.clientWidth / 2;
+        let nearest = 0;
+        let best = Infinity;
+        Array.from(track.children).forEach((child, i) => {
+          const item = child as HTMLElement;
+          const distance = Math.abs(item.offsetLeft + item.offsetWidth / 2 - centre);
+          if (distance < best) {
+            best = distance;
+            nearest = i;
+          }
+        });
+        indexRef.current = nearest;
+        setIndex(nearest);
+      });
     };
-    centre();
-    const observer = new ResizeObserver(centre);
-    observer.observe(wall);
-    return () => observer.disconnect();
-  }, [index]);
+    wall.addEventListener('scroll', onScroll, { passive: true });
+    return () => {
+      cancelAnimationFrame(frame);
+      wall.removeEventListener('scroll', onScroll);
+    };
+  }, []);
 
   for (let i = index - LOAD_AHEAD; i <= index + LOAD_AHEAD; i += 1) {
     if (i >= 0 && i < count) seen.current.add(i);
@@ -63,21 +106,6 @@ export const GalleryRoom = ({ artworks, kind, label }: GalleryRoomProps) => {
     else if (event.key === 'End') go(count - 1);
     else return;
     event.preventDefault();
-  };
-
-  const onPointerDown = (event: PointerEvent<HTMLDivElement>) => {
-    swipe.current = { x: event.clientX, id: event.pointerId };
-    didSwipe.current = false;
-  };
-
-  const onPointerUp = (event: PointerEvent<HTMLDivElement>) => {
-    const start = swipe.current;
-    swipe.current = null;
-    if (!start || start.id !== event.pointerId) return;
-    const delta = event.clientX - start.x;
-    if (Math.abs(delta) < SWIPE_PX) return;
-    didSwipe.current = true;
-    go(index + (delta < 0 ? 1 : -1));
   };
 
   const active = artworks[index];
@@ -93,12 +121,8 @@ export const GalleryRoom = ({ artworks, kind, label }: GalleryRoomProps) => {
         aria-label={label}
         tabIndex={0}
         onKeyDown={onKeyDown}
-        onPointerDown={onPointerDown}
-        onPointerUp={onPointerUp}
-        onPointerCancel={() => (swipe.current = null)}
       >
-        <div className="room__light" aria-hidden="true" />
-        <ul ref={trackRef} className="room__track" style={{ translate: `${shift}px 0` }}>
+        <ul ref={trackRef} className="room__track">
           {artworks.map((artwork, i) => {
             const isActive = i === index;
             return (
@@ -114,7 +138,6 @@ export const GalleryRoom = ({ artworks, kind, label }: GalleryRoomProps) => {
                   tabIndex={isActive ? 0 : -1}
                   aria-label={isActive ? `See ${describeArt(artwork)} full-screen` : `Go to ${describeArt(artwork)}`}
                   onClick={() => {
-                    if (didSwipe.current) return;
                     if (isActive) setOpenIndex(i);
                     else go(i);
                   }}
@@ -127,7 +150,6 @@ export const GalleryRoom = ({ artworks, kind, label }: GalleryRoomProps) => {
             );
           })}
         </ul>
-        <div className="room__floor" aria-hidden="true" />
       </div>
 
       <div className="room__bar">
@@ -137,13 +159,13 @@ export const GalleryRoom = ({ artworks, kind, label }: GalleryRoomProps) => {
             <span>{placard.detail}</span>
           </p>
         )}
-        <p className="room__count">
-          {index + 1} of {count}
-        </p>
         <div className="room__controls">
           <button type="button" className="round" aria-label="Previous piece" disabled={index === 0} onClick={() => go(index - 1)}>
             ←
           </button>
+          <p className="room__count">
+            {index + 1} of {count}
+          </p>
           <button type="button" className="round" aria-label="Next piece" disabled={index === count - 1} onClick={() => go(index + 1)}>
             →
           </button>
