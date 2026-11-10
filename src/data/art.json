@@ -1044,18 +1044,6 @@
     "v": "eb76ab69"
   },
   {
-    "id": "a089",
-    "w": 1271,
-    "h": 1655,
-    "title": null,
-    "year": "2021",
-    "kind": null,
-    "hero": false,
-    "heroOrder": null,
-    "section": "painting",
-    "v": "6ab28fed"
-  },
-  {
     "id": "a097",
     "w": 2277,
     "h": 2885,
@@ -1224,18 +1212,6 @@
     "v": "0f7581d6"
   },
   {
-    "id": "a172",
-    "w": 1647,
-    "h": 2797,
-    "title": null,
-    "year": "2020",
-    "kind": null,
-    "hero": false,
-    "heroOrder": null,
-    "section": "painting",
-    "v": "bd55ea67"
-  },
-  {
     "id": "a005",
     "w": 1623,
     "h": 1862,
@@ -1282,6 +1258,30 @@
     "heroOrder": null,
     "section": "sketch",
     "v": "5f0fb1f9"
+  },
+  {
+    "id": "a089",
+    "w": 1271,
+    "h": 1655,
+    "title": null,
+    "year": "2018",
+    "kind": null,
+    "hero": false,
+    "heroOrder": null,
+    "section": "painting",
+    "v": "6ab28fed"
+  },
+  {
+    "id": "a172",
+    "w": 1647,
+    "h": 2797,
+    "title": null,
+    "year": "2018",
+    "kind": null,
+    "hero": false,
+    "heroOrder": null,
+    "section": "painting",
+    "v": "bd55ea67"
   },
   {
     "id": "a128",
