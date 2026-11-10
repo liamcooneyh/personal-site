@@ -20,8 +20,8 @@ export const Projects = () => (
           <ToolChips tools={project.stack} label={`Built with`} />
         </div>
         {project.link && (
-          <a className="pill tile__link" href={project.link} target="_blank" rel="noreferrer">
-            See the code
+          <a className="pill pill--ink pill--big tile__link" href={project.link} target="_blank" rel="noreferrer">
+            See the code on GitHub
           </a>
         )}
       </article>
